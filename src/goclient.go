@@ -29,26 +29,24 @@ func main(){
 func handleConnection(conn net.Conn){
 
 	for {
-		//in := make([]byte, 1024)	
-		//fmt.Println("Please input the sent message:")
-		//inLen, err := fmt.Scan(&in)
-		//inLen, err := fmt.Scanln(&in)
-		reader := bufio.NewReader(os.stdin)
-		in,_,_ := reader.ReadLine()
+		reader := bufio.NewReader(os.Stdin)
+		in, _, err := reader.ReadLine()
 		if err != nil {
 			fmt.Println("Input exception: ", err.Error())
 			//return
 		}
-		fmt.Println("Input length: ", inLen, len(in), in)	
+		//input data
+		fmt.Println("input data: ", in)
+		
 		//send data
- 		data := protocol.Write(in[0:len(in)])
+		data := protocol.Write(in[0:len(in)])
 		fmt.Println("input package: ", data)	
 		_, err = conn.Write(data)
 		if err != nil {
 			fmt.Println("Error send data: ", err.Error())
 		}
 		
-		inStr := string(data[0:])
+		inStr := string(in[0:])
 		if inStr == "quit" {
 			break
 		}

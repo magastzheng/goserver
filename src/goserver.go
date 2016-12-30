@@ -12,34 +12,6 @@ import (
 
 
 func main(){
-	
-	//tcpAddr, err := net.ResolveTCPAddr("tcp", "127.0.0.1:90001")
-	//if err != nil{
-	//	fmt.Println("Fail to parse the IP address")
-	//}
-	
-	//conn, err := net.DialTCP("tcp", nil, tcpAddr)
-	//if err != nil{
-	//	fmt.Println("Fail to DialTCP")
-	//	panic(err)
-	//}
-	
-	//listen, err := net.ListenTCP("tcp", tcpAddr)
-	//if err != nil{
-	//	panic(err)
-	//}
-	//conn, err = listen.Accept()
-	//
-	//if err != ni{
-	//	panic(err)
-	//}
-	//defer conn.Close()
-	
-	//conn, err := net.Dial("tcp", "127.0.0.1:90001")
-	//if err != nil {
-	//	panic(err)
-	//}
-	
 	listener, err := net.Listen("tcp", ":9001")
 	if err != nil{
 		panic(err)
@@ -56,6 +28,10 @@ func main(){
 	fmt.Println("Test go server")
 }
 
+//每次读入部分字节,如果本次读取的数据没有结束,再读入更多字符。直到读完本次数据包为止
+//此时会出现多读入的情况,在读下一个包的时候,需要回填过来
+//如果设计开始标记和结束标记,则需要对数据做编码解码[发送前编码,接收后先解码]
+//是否需要添加校验标识符
 func handleConnection(conn net.Conn){
 	defer conn.Close()
 	
@@ -64,14 +40,14 @@ func handleConnection(conn net.Conn){
 
 	buf := make([]byte, 1024)
 	for {
-		_, err := conn.Read(buf)
-		//message, err := reader.ReadString('\n')
+		n, err := conn.Read(buf)
 		if err != nil {
 			fmt.Println("Error reading: ", err.Error())
 			return
 		}
 		
-		pkgbuf,_ := protocol.Read(buf)
+		fmt.Println("accept data: ", buf[0:n])	
+		pkgbuf,_ := protocol.Read(buf[0:n])
 		
 		fmt.Println("Accept data from client: ", string(pkgbuf[0:]))
 		//fmt.Println("Accept data from client: ", message)
